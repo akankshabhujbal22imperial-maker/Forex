@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XAU/USD Live Dashboard</title>
+    <style>
+        :root { --gold: #d4af37; --dark: #1a1a1a; --white: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--dark); color: var(--white); display: flex; justify-content: center; padding: 20px; }
+        .dashboard { width: 100%; max-width: 400px; }
+        .card { background: #2a2a2a; padding: 20px; border-radius: 12px; border-left: 5px solid var(--gold); cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .card:hover { transform: translateY(-5px); background: #333; }
+        .pair-title { font-size: 1.2rem; color: var(--gold); margin: 0; }
+        .price { font-size: 2rem; font-weight: bold; margin: 10px 0; }
+        .details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #444; font-size: 0.9rem; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .status { color: #888; font-size: 0.8rem; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="dashboard">
+    <h2>Forex Dashboard</h2>
+    <div class="card" onclick="toggleDetails()">
+        <p class="pair-title">XAU / USD (Gold)</p>
+        <div class="price" id="gold-price">Loading...</div>
+        <div class="status" id="last-update">Updating...</div>
+        
+        <div id="details" class="details">
+            <p><strong>Base:</strong> Gold (1 Ounce)</p>
+            <p><strong>Currency:</strong> US Dollar</p>
+            <p><strong>Market Status:</strong> Live Feed</p>
+            <p id="detailed-rate"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Replace 'YOUR_API_KEY' with a free key from https://www.exchangerate-api.com/
+    const API_URL = 'https://open.er-api.com/v6/latest/XAU';
+
+    async function fetchForexData() {
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
+            
+            const price = data.rates.USD.toFixed(2);
+            document.getElementById('gold-price').innerText = `$${price}`;
+            document.getElementById('last-update').innerText = `Last Updated: ${new Date().toLocaleTimeString()}`;
+            document.getElementById('detailed-rate').innerText = `Current Exchange Rate: 1 XAU = ${price} USD`;
+        } catch (error) {
+            document.getElementById('gold-price').innerText = "Error";
+            console.error("Fetch error:", error);
+        }
+    }
+
+    function toggleDetails() {
+        const details = document.getElementById('details');
+        details.style.display = details.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // Update price every 30 seconds
+    fetchForexData();
+    setInterval(fetchForexData, 30000);
+</script>
+
+</body>
+</html>
